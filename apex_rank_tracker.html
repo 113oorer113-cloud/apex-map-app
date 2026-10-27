@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111318">
+<title>DROP // APEX ランク情報</title>
+<style>
+:root{--bg:#0c0e12;--panel:#151920;--line:#2c323d;--red:#ff4d4d;--orange:#ff8a45;--text:#f3f5f7;--muted:#9aa4b2;--cyan:#65e6e0}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 85% -10%,#3b1c22 0,transparent 42%),var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif}
+header{padding:24px 18px 18px;border-bottom:1px solid var(--line);background:#101217d9;position:relative;overflow:hidden}
+header:after{content:"";position:absolute;right:-30px;top:-48px;width:160px;height:160px;border:1px solid #ff4d4d55;transform:rotate(45deg)}
+.kicker{font-size:10px;letter-spacing:.24em;color:var(--red);font-weight:800}.brand{font-size:25px;font-weight:950;letter-spacing:.04em;margin:5px 0}.sub{font-size:11px;color:var(--muted);letter-spacing:.12em}
+main{max-width:680px;margin:auto;padding:16px 14px 40px}.section-label{font-size:11px;letter-spacing:.16em;color:var(--muted);font-weight:800;margin:22px 2px 10px}
+.card{background:linear-gradient(145deg,#191e26,#12151b);border:1px solid var(--line);border-radius:15px;padding:16px;margin-bottom:12px;box-shadow:0 8px 28px #0002}
+.hero{border-color:#79343b;background:linear-gradient(135deg,#2b171c,#17191f 70%);position:relative;overflow:hidden}
+.hero:after{content:"RANKED";position:absolute;right:-7px;bottom:-14px;font-size:58px;font-weight:1000;color:#ffffff08;font-style:italic}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.eyebrow{font-size:10px;letter-spacing:.15em;color:#ff9b9b;font-weight:800}.mapname{font-size:29px;line-height:1.2;font-weight:950;margin:8px 0}.pill{border:1px solid #9e454c;color:#ffb0b0;border-radius:99px;padding:5px 9px;font-size:10px;font-weight:800;white-space:nowrap}
+.timer{font-size:33px;letter-spacing:.04em;font-weight:900;font-variant-numeric:tabular-nums;margin:8px 0 2px}.small{font-size:11px;color:var(--muted);line-height:1.65}.progress{height:5px;background:#333943;border-radius:8px;overflow:hidden;margin:13px 0 6px}.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--orange));width:0}
+.nextmap{font-size:20px;font-weight:850;margin:5px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:#0f1217;border:1px solid var(--line);padding:13px;border-radius:12px}.stat .value{font-size:20px;font-weight:900;margin-top:6px}.stat .label{font-size:10px;color:var(--muted);letter-spacing:.1em}
+.timeline{display:flex;flex-direction:column;gap:9px}.item{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line);background:#11151b;border-radius:11px}.datebox{min-width:64px;text-align:center;padding:7px 4px;background:#242a34;border-radius:8px}.datebox strong{display:block;font-size:18px}.datebox span{font-size:9px;color:var(--muted)}.itemmain{flex:1}.itemtitle{font-size:13px;font-weight:800}.itemdesc{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5}.status{font-size:9px;color:var(--cyan);font-weight:800;letter-spacing:.1em}
+footer{padding:10px 4px 25px;color:var(--muted);font-size:10px;line-height:1.7}a{color:var(--cyan)}button{border:1px solid #424b58;background:#242a34;color:#fff;border-radius:9px;padding:9px 12px;font-weight:700;font-size:11px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.note{border-left:2px solid var(--orange);padding:9px 11px;background:#211a16;border-radius:0 8px 8px 0;color:#d8c4b8;font-size:10px;line-height:1.6}
+@media(min-width:600px){main{padding:22px}.mapname{font-size:36px}.timer{font-size:40px}}
+</style>
+</head>
+<body>
+<header><div class="kicker">DROP // INTEL SYSTEM</div><div class="brand">APEX <span style="color:var(--red)">RANK</span> TRACKER</div><div class="sub">MAP ROTATION / SPLIT STATUS / JAPAN TIME</div></header>
+<main>
+  <div class="section-label">01 — CURRENT RANKED MAP</div>
+  <section class="card hero">
+    <div class="row"><div class="eyebrow">NOW IN ROTATION</div><span class="pill">RANKED · BR</span></div>
+    <div class="mapname" id="currentMap">読み込み中…</div>
+    <div class="small" id="mapWindow">マップ情報を計算しています</div>
+    <div class="section-label" style="margin:18px 0 0;color:#ffb0b0">NEXT ROTATION IN</div>
+    <div class="timer" id="countdown">--:--:--</div>
+    <div class="progress"><span id="progress"></span></div>
+    <div class="row small"><span>ローテーション進行状況</span><span id="progressText">--%</span></div>
+  </section>
+  <section class="card">
+    <div class="row"><div><div class="eyebrow" style="color:var(--cyan)">UP NEXT</div><div class="nextmap" id="nextMap">—</div><div class="small" id="nextTime">次の切り替え時刻</div></div><div style="font-size:34px">◈</div></div>
+    <div class="actions"><button id="refreshBtn">表示を更新</button><button id="copyBtn">現在の情報をコピー</button></div>
+  </section>
+  <div class="section-label">02 — SPLIT STATUS</div>
+  <section class="card">
+    <div class="row"><div><div class="eyebrow">SEASON 30</div><div style="font-size:20px;font-weight:900;margin-top:5px">スプリット 2</div></div><span class="pill" id="splitBadge">開催中</span></div>
+    <div class="grid" style="margin-top:14px">
+      <div class="stat"><div class="label">開始日</div><div class="value" style="font-size:17px">9/15</div><div class="small">2026年</div></div>
+      <div class="stat"><div class="label">終了目安</div><div class="value" style="font-size:17px">11/4</div><div class="small">2026年・日本時間</div></div>
+      <div class="stat"><div class="label">終了まで</div><div class="value" id="splitDays">—</div><div class="small">日（目安）</div></div>
+      <div class="stat"><div class="label">次のシーズン</div><div class="value" style="font-size:17px">11月予定</div><div class="small">詳細日程は要確認</div></div>
+    </div>
+    <div class="note" style="margin-top:13px">終了目安は公開トラッカーを参考にした推定日時です。公式が時刻まで確定発表していない場合があるため、ゲーム内表示を優先してください。</div>
+  </section>
+  <div class="section-label">03 — RANKED LADDER CALENDAR</div>
+  <section class="card"><div class="timeline" id="ladderList"></div></section>
+  <div class="section-label">04 — MAP ROTATION ORDER</div>
+  <section class="card"><div class="timeline" id="rotationList"></div><p class="small" style="margin-bottom:0">各マップ約4時間30分。実際のローテーションが更新された場合、計算結果とゲーム内表示がずれることがあります。</p></section>
+  <footer>UNOFFICIAL FAN TOOL · 本アプリはEA / Respawn公式ではありません。マップ情報は公開スケジュールに基づく推定表示で、ゲームへの直接接続や公式APIによるリアルタイム照会は行いません。<br>情報確認：<a href="https://www.ea.com/games/apex-legends/apex-legends/news/marked-midseason-patch-notes" target="_blank" rel="noreferrer">EA公式パッチノート</a> · <a href="https://apexranked.com/map-rotation" target="_blank" rel="noreferrer">Apex Ranked ローテーション</a> · <a href="https://playvitals.com/ja/seasons" target="_blank" rel="noreferrer">シーズン日程トラッカー</a></footer>
+</main>
+<script>
+const maps = ["Broken Moon","World's Edge","Olympus"];
+const jp = {"Broken Moon":"ブロークンムーン","World's Edge":"ワールズエッジ","Olympus":"オリンパス"};
+// Public tracker anchor: Broken Moon rotation began 2026-09-20 00:30 UTC; 4h30m per map.
+const anchor = Date.UTC(2026,8,20,0,30,0);
+const duration = 4.5*60*60*1000;
+const fmt = new Intl.DateTimeFormat('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
+const weekdays = ['日','月','火','水','木','金','土'];
+function update(){
+ const now=Date.now(), elapsed=Math.max(0,now-anchor), slot=Math.floor(elapsed/duration), index=slot%3;
+ const start=anchor+slot*duration, end=start+duration, next=maps[(index+1)%3];
+ document.getElementById('currentMap').textContent=jp[maps[index]];
+ document.getElementById('mapWindow').textContent=fmt.format(new Date(start))+' 〜 '+fmt.format(new Date(end))+'（日本時間）';
+ document.getElementById('nextMap').textContent=jp[next];
+ document.getElementById('nextTime').textContent='切り替え予定 '+fmt.format(new Date(end));
+ let left=Math.max(0,end-now), h=Math.floor(left/3600000), m=Math.floor(left%3600000/60000), s=Math.floor(left%60000/1000);
+ document.getElementById('countdown').textContent=[h,m,s].map(v=>String(v).padStart(2,'0')).join(':');
+ const pct=Math.min(100,Math.max(0,(now-start)/duration*100)); document.getElementById('progress').style.width=pct+'%';document.getElementById('progressText').textContent=Math.floor(pct)+'%';
+ const splitStart=Date.UTC(2026,8,15,0,0), splitEnd=Date.UTC(2026,10,3,18,0); // approx. Nov 4 03:00 JST
+ const days=Math.ceil((splitEnd-now)/86400000);
+ document.getElementById('splitDays').textContent=days>=0?days+'日':'終了目安経過';
+ document.getElementById('splitBadge').textContent=now<splitStart?'開始前':now<splitEnd?'開催中':'終了目安経過';
+}
+const ladders=[
+ ['9/22','ラダー 1','9/22 〜 9/27'],['9/29','ラダー 2','9/29 〜 10/4'],['10/6','ラダー 3','10/6 〜 10/11'],['10/13','ラダー 4','10/13 〜 10/18'],['10/20','ラダー 5','10/20 〜 10/25'],['10/27','ラダー 6','10/27 〜 11/1']
+];
+document.getElementById('ladderList').innerHTML=ladders.map((x,i)=>`<div class="item"><div class="datebox"><strong>${x[0]}</strong><span>2026</span></div><div class="itemmain"><div class="itemtitle">${x[1]}</div><div class="itemdesc">${x[2]}</div></div><div class="status">${i===5?'NEXT':'DONE'}</div></div>`).join('');
+document.getElementById('rotationList').innerHTML=maps.map((m,i)=>`<div class="item"><div class="datebox"><strong>0${i+1}</strong><span>MAP</span></div><div class="itemmain"><div class="itemtitle">${jp[m]}</div><div class="itemdesc">${m}</div></div><div class="status">4H 30M</div></div>`).join('');
+document.getElementById('refreshBtn').addEventListener('click',update);
+document.getElementById('copyBtn').addEventListener('click',()=>{const t='APEXランクマップ：'+document.getElementById('currentMap').textContent+' / 次：'+document.getElementById('nextMap').textContent+' / 切替まで '+document.getElementById('countdown').textContent; if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>alert('コピーしました')).catch(()=>prompt('コピーしてください',t));else prompt('コピーしてください',t);});
+update();setInterval(update,1000);
+</script>
+</body>
+</html>
